@@ -1,9 +1,15 @@
-#include "../include/example_header.h"
+#include "../include/template_application.h"
 
 #include <iostream>
 
-int main() {
-	std::cout << "Empty project" << std::endl;
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    (void)nCmdShow;
+    (void)lpCmdLine;
+    (void)hPrevInstance;
 
-	return 0;
+    TemplateApplication app;
+    app.Initialize((void *)&hInstance, ysContextObject::DIRECTX11);
+    app.Run();
+
+    return 0;
 }
