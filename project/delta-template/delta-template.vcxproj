@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,15 +20,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\os_utilities.cpp" />
     <ClCompile Include="..\..\src\template_application.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h" />
+    <ClInclude Include="..\..\include\os_utilities.h" />
     <ClInclude Include="..\..\include\template_application.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dependencies\submodules\delta-studios\project\delta-basic-engine\delta-basic-engine.vcxproj">
+      <Project>{4192524d-8d19-4bec-a9f0-c18c1333c456}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\dependencies\submodules\delta-studios\project\delta-core\delta-core.vcxproj">
+      <Project>{6db2fa44-5c75-431b-85f5-baa11d6ef583}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{6DB2FA44-5C75-431B-85F5-BAA11D6EF583}</ProjectGuid>
+    <ProjectGuid>{B81F82B7-286D-4FCC-ADAC-342F880ACC85}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>emptyproject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -38,27 +48,27 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -82,33 +92,33 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)\..\..\dependencies;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
-    <LibraryPath>$(ProjectDir)\..\..\dependencies\delta\lib\$(PlatformTarget)\$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)/../../dependencies/delta/lib/$(PlatformTarget)/$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\boost-filesystem\lib\$(PlatformTarget)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)\..\..\dependencies;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
-    <LibraryPath>$(ProjectDir)\..\..\dependencies\delta\lib\$(PlatformTarget)\$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)/../../dependencies/delta/lib/$(PlatformTarget)/$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\boost-filesystem\lib\$(PlatformTarget)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)\..\..\dependencies;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
-    <LibraryPath>$(ProjectDir)\..\..\dependencies\delta\lib\$(PlatformTarget)\$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)/../../dependencies/delta/lib/$(PlatformTarget)/$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\boost-filesystem\lib\$(PlatformTarget)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)\..\..\dependencies;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <OutDir>$(SolutionDir)\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
-    <LibraryPath>$(ProjectDir)\..\..\dependencies\delta\lib\$(PlatformTarget)\$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)/../../dependencies/delta/lib/$(PlatformTarget)/$(Configuration);$(ProjectDir)/../../dependencies/libraries/SDL/lib/$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\D3DX\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DirectSound\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\DXGI\lib\$(PlatformTarget);$(ProjectDir)/../../dependencies\libraries\boost-filesystem\lib\$(PlatformTarget)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -126,9 +136,16 @@
     </Link>
     <PostBuildEvent>
       <Command>py $(ProjectDir)\..\..\scripts\increment_build_version.py
-py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
-</Command>
+py $(ProjectDir)\..\..\scripts\package_application.py $(PlatformTarget) $(Configuration) "$(VCInstallDir)\Redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC142.CRT" $(ProjectName)
+py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>py $(ProjectDir)\..\..\scripts\fetch_local_delta_build.py $(ProjectName)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -146,9 +163,16 @@ py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
     </Link>
     <PostBuildEvent>
       <Command>py $(ProjectDir)\..\..\scripts\increment_build_version.py
-py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
-</Command>
+py $(ProjectDir)\..\..\scripts\package_application.py $(PlatformTarget) $(Configuration) "$(VCInstallDir)\Redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC142.CRT" $(ProjectName)
+py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>py $(ProjectDir)\..\..\scripts\fetch_local_delta_build.py $(ProjectName)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -170,9 +194,16 @@ py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
     </Link>
     <PostBuildEvent>
       <Command>py $(ProjectDir)\..\..\scripts\increment_build_version.py
-py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
-</Command>
+py $(ProjectDir)\..\..\scripts\package_application.py $(PlatformTarget) $(Configuration) "$(VCInstallDir)\Redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC142.CRT" $(ProjectName)
+py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>py $(ProjectDir)\..\..\scripts\fetch_local_delta_build.py $(ProjectName)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -194,9 +225,16 @@ py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
     </Link>
     <PostBuildEvent>
       <Command>py $(ProjectDir)\..\..\scripts\increment_build_version.py
-py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)
-</Command>
+py $(ProjectDir)\..\..\scripts\package_application.py $(PlatformTarget) $(Configuration) "$(VCInstallDir)\Redist\MSVC\$(VCToolsRedistVersion)\$(PlatformTarget)\Microsoft.VC142.CRT" $(ProjectName)
+py $(ProjectDir)\..\..\scripts\copy_dlls.py $(PlatformTarget) $(Configuration)</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>py $(ProjectDir)\..\..\scripts\fetch_local_delta_build.py $(ProjectName)</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

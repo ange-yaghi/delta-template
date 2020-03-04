@@ -24,12 +24,18 @@
     <ClCompile Include="..\..\src\template_application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\os_utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
       <Filter>Header Files\delta-includes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\template_application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\os_utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

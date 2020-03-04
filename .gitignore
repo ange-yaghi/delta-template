@@ -93,7 +93,6 @@ StyleCopReport.xml
 *.scc
 *.bmp
 *.exe
-!dependencies/**/*.exe
 *.dll
 !dependencies/runtime/x64/*.dll
 !dependencies/runtime/x86/*.dll
@@ -348,3 +347,6 @@ ASALocalRun/
 
 # Ignore user's workspace
 workspace/
+
+# Submodules
+dependencies/submodules/

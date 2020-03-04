@@ -11,8 +11,6 @@ public:
     void Initialize(void *instance, ysContextObject::DEVICE_API api);
     void Run();
 
-    float m_currentAngle;
-
 protected:
     void Process();
     void Render();

@@ -1,7 +1,6 @@
 #include "../include/template_application.h"
 
 TemplateApplication::TemplateApplication() {
-    m_currentAngle = 0.0f;
     m_demoTexture = nullptr;
 }
 
@@ -10,20 +9,34 @@ TemplateApplication::~TemplateApplication() {
 }
 
 void TemplateApplication::Initialize(void *instance, ysContextObject::DEVICE_API api) {
-    m_engine.GetConsole()->SetDefaultFontDirectory("../../dependencies/delta/engines/basic/fonts/");
+    dbasic::Path modulePath = dbasic::GetModulePath();
+    dbasic::Path confPath = modulePath.Append("delta.conf");
+
+    std::string enginePath = "../../dependencies/delta/engines/basic";
+    std::string assetPath = "../../assets";
+    if (confPath.Exists()) {
+        std::fstream confFile(confPath.ToString(), std::ios::in);
+        
+        std::getline(confFile, enginePath);
+        std::getline(confFile, assetPath);
+        enginePath = modulePath.Append(enginePath).ToString();
+        assetPath = modulePath.Append(assetPath).ToString();
+
+        confFile.close();
+    }
+
+    m_engine.GetConsole()->SetDefaultFontDirectory(enginePath + "/fonts/");
 
     m_engine.CreateGameWindow(
         "Delta Template Application",
         instance,
         api,
-        "../../dependencies/delta/engines/basic/shaders/"); // TODO: path should be relative to exe
+        (enginePath + "/shaders/").c_str());
 
     m_engine.SetClearColor(0x34, 0x98, 0xdb);
 
     m_assetManager.SetEngine(&m_engine);
-    m_engine.LoadTexture(&m_demoTexture, "../../assets/chicken.png");
-
-    m_currentAngle = 0.0f;
+    m_engine.LoadTexture(&m_demoTexture, (assetPath + "/chicken.png").c_str());
 }
 
 void TemplateApplication::Process() {
