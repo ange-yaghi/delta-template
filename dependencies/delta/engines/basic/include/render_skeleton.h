@@ -3,7 +3,6 @@
 
 #include "delta_core.h"
 
-#include "rigid_body.h"
 #include "render_node.h"
 
 namespace dbasic {
@@ -17,10 +16,15 @@ namespace dbasic {
         RenderNode *GetNode(int index);
         RenderNode *GetNode(const char *nodeName);
 
+        void BindAction(ysAnimationAction *action, ysAnimationActionBinding *binding);
+
         int GetNodeCount() const { return m_renderNodes.GetNumObjects(); }
         RenderNode *FindNode(const char *nodeName);
 
         void Update();
+        void UpdateAnimation(float dt);
+
+        ysAnimationMixer AnimationMixer;
 
     protected:
         // Container for all nodes

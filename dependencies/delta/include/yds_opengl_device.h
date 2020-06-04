@@ -25,7 +25,7 @@ public:
     virtual ysError SetContextMode(ysRenderingContext *context, ysRenderingContext::ContextMode mode);
 
     virtual ysError CreateOnScreenRenderTarget(ysRenderTarget **newTarget, ysRenderingContext *context, bool depthBuffer);
-    virtual ysError CreateOffScreenRenderTarget(ysRenderTarget **newTarget, int width, int height, ysRenderTarget::RENDER_TARGET_FORMAT format, int sampleCount, bool depthBuffer);
+    virtual ysError CreateOffScreenRenderTarget(ysRenderTarget **newTarget, int width, int height, ysRenderTarget::Format format, int sampleCount, bool depthBuffer);
     virtual ysError CreateSubRenderTarget(ysRenderTarget **newTarget, ysRenderTarget *parent, int x, int y, int width, int height);
     virtual ysError ResizeRenderTarget(ysRenderTarget *target, int width, int height);
     virtual ysError DestroyRenderTarget(ysRenderTarget *&target);
@@ -88,7 +88,7 @@ protected:
     static unsigned int GetPixel(SDL_Surface *surface, int x, int y);
 
     // Get a GL type from a geometry channel format
-    static int GetFormatGLType(ysRenderGeometryChannel::CHANNEL_FORMAT format);
+    static int GetFormatGLType(ysRenderGeometryChannel::ChannelFormat format);
 
 protected:
     ysOpenGLVirtualContext *m_realContext;
@@ -97,7 +97,7 @@ protected:
 
 protected:
     // Hidden functionality
-    ysError CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target, int width, int height, ysRenderTarget::RENDER_TARGET_FORMAT format, int sampleCount, bool depthBuffer);
+    ysError CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target, int width, int height, ysRenderTarget::Format format, int sampleCount, bool depthBuffer);
     ysError DestroyOpenGLRenderTarget(ysRenderTarget *target);
 
 };

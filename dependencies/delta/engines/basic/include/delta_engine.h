@@ -7,27 +7,35 @@
 #include "shader_controls.h"
 #include "animation.h"
 
-#include "rigid_body_system.h"
+#include "../../../physics/include/mass_spring_system.h"
+#include "../../../physics/include/rigid_body_system.h"
 
 #include "model_asset.h"
-#include "mass_spring_system.h"
+#include "audio_asset.h"
 #include "console.h"
 
 namespace dbasic {
 
-    struct DrawCall {
-        ysTexture *Texture;
-        ShaderObjectVariables ObjectVariables;
-        ModelAsset *Model;
-    };
+    class RenderSkeleton;
 
     class DeltaEngine : public ysObject {
     public:
         static const int MAX_LAYERS = 256;
 
-        enum DRAW_TARGET {
-            DRAW_TARGET_GUI,
-            DRAW_TARGET_MAIN
+        enum class DrawTarget {
+            Gui,
+            Main
+        };
+
+        enum class CameraMode {
+            Target,
+            Flat
+        };
+
+        struct DrawCall {
+            ysTexture *Texture = nullptr;
+            ShaderObjectVariables ObjectVariables;
+            ModelAsset *Model = nullptr;
         };
 
     public:
@@ -35,19 +43,29 @@ namespace dbasic {
         ~DeltaEngine();
 
         // Physics Interface
-        MassSpringSystem PhysicsSystem;
+        dphysics::MassSpringSystem PhysicsSystem;
+        dphysics::RigidBodySystem RBSystem;
 
         ysError CreateGameWindow(const char *title, void *instance, ysContextObject::DEVICE_API API, const char *shaderDirectory = "../DeltaEngineTullahoma/Shaders/", bool depthBuffer = true);
         ysError StartFrame();
         ysError EndFrame();
         ysError Destroy();
 
+        ysError UseMaterial(Material *material);
+
+        ysError AddLight(const Light &light);
+        void ResetLights();
+        ysError SetAmbientLight(const ysVector4 &ambient);
+
         ysError DrawImage(ysTexture *image, int layer = 0, float scaleX = 1.0f, float scaleY = 1.0f, float texOffsetU = 0.0f, float texOffsetV = 0.0f, float texScaleX = 1.0f, float texScaleY = 1.0f);
-        ysError DrawBox(const int color[3], float width, float height, int layer = 0);
-        ysError DrawAxis(const int color[3], const ysVector &position, const ysVector &direction, float width, float length, int layer = 0);
-        ysError DrawModel(ModelAsset *model, const ysMatrix &transform, float scale, ysTexture *texture, int layer = 0);
+        ysError DrawBox(float width, float height, int layer = 0, bool lit = true);
+        ysError DrawAxis(const ysVector &position, const ysVector &direction, float width, float length, int layer = 0, bool lit = false);
+        ysError DrawModel(ModelAsset *model, float scale, ysTexture *texture, int layer = 0, bool lit = true);
+        ysError DrawRenderSkeleton(RenderSkeleton *skeleton, float scale, int layer);
         ysError LoadTexture(ysTexture **image, const char *fname);
         ysError LoadAnimation(Animation **animation, const char *path, int start, int end);
+
+        ysError PlayAudio(AudioAsset *audio);
 
         void SubmitSkeleton(Skeleton *skeleton);
 
@@ -59,8 +77,25 @@ namespace dbasic {
 
         // Shader Controls
         void SetCameraPosition(float x, float y);
+        void SetCameraPosition(const ysVector &pos);
+        ysVector GetCameraPosition() const;
+        void GetCameraPosition(float *x, float *y) const;
+
+        void SetCameraTarget(const ysVector &target);
+        ysVector GetCameraTarget() const { return m_cameraTarget; }
+
+        void SetCameraMode(CameraMode mode);
+        CameraMode GetCameraMode() const { return m_cameraMode; }
+
         void SetCameraAngle(float angle);
+
+        float GetCameraFov() const;
+        void SetCameraFov(float fov);
+
+        float GetCameraAspect() const;
+
         void SetCameraAltitude(float altitude);
+        float GetCameraAltitude() const;
 
         void SetObjectTransform(const ysMatrix &mat);
         void SetPositionOffset(const ysVector &position);
@@ -74,30 +109,43 @@ namespace dbasic {
         void GetMousePos(int *x, int *y);
 
         float GetFrameLength();
+        float GetAverageFramerate();
 
-        void SetMultiplyColor(ysVector4 color);
-        void ResetMultiplyColor();
+        void ResetBrdfParameters();
+        void SetBaseColor(const ysVector &color);
+        void ResetBaseColor();
+
+        void SetEmission(const ysVector &emission);
+        void SetSpecularMix(float specularMix);
+        void SetDiffuseMix(float diffuseMix);
+        void SetMetallic(float metallic);
+        void SetDiffuseRoughness(float diffuseRoughness);
+        void SetSpecularRoughness(float specularRoughness);
+        void SetSpecularPower(float power);
+        void SetIncidentSpecular(float incidentSpecular);
 
         ysDevice *GetDevice() { return m_device; }
 
-        void SetDrawTarget(DRAW_TARGET target) { m_currentTarget = target; }
+        void SetDrawTarget(DrawTarget target) { m_currentTarget = target; }
 
         int GetScreenWidth();
         int GetScreenHeight();
 
         Console *GetConsole() { return &m_console; }
 
+        ysAudioDevice *GetAudioDevice() const { return m_audioDevice; }
+
     protected:
-        float m_cameraX;
-        float m_cameraY;
-        float m_cameraAltitude;
         float m_cameraAngle;
+        float m_cameraFov;
+
+        ysVector m_cameraPosition;
+        ysVector m_cameraTarget;
 
         ysMatrix m_perspectiveProjection;
         ysMatrix m_orthographicProjection;
 
-        //protected:
-    public:
+    protected:
         ysDevice *m_device;
 
         ysWindowSystem *m_windowSystem;
@@ -110,6 +158,7 @@ namespace dbasic {
         ysRenderTarget *m_mainRenderTarget;
 
         ysAudioSystem *m_audioSystem;
+        ysAudioDevice *m_audioDevice;
 
         ysGPUBuffer *m_mainVertexBuffer;
         ysGPUBuffer *m_mainIndexBuffer;
@@ -118,10 +167,16 @@ namespace dbasic {
         ysInputDevice *m_mainMouse;
 
         // Shader Controls
-
         ysGPUBuffer *m_shaderObjectVariablesBuffer;
         ShaderObjectVariables m_shaderObjectVariables;
         bool m_shaderObjectVariablesSync;
+
+        ysGPUBuffer *m_consoleShaderObjectVariablesBuffer;
+        ConsoleShaderObjectVariables m_consoleShaderObjectVariables;
+
+        ysGPUBuffer *m_lightingControlBuffer;
+        LightingControls m_lightingControls;
+        int m_lightCount;
 
         ysGPUBuffer *m_shaderScreenVariablesBuffer;
         ShaderScreenVariables m_shaderScreenVariables;
@@ -133,20 +188,26 @@ namespace dbasic {
         ysShader *m_vertexShader;
         ysShader *m_vertexSkinnedShader;
         ysShader *m_pixelShader;
+        ysShader *m_consoleVertexShader;
+        ysShader *m_consolePixelShader;
         ysShaderProgram *m_shaderProgram;
         ysShaderProgram *m_skinnedShaderProgram;
+        ysShaderProgram *m_consoleProgram;
 
         ysRenderGeometryFormat m_skinnedFormat;
         ysRenderGeometryFormat m_standardFormat;
+        ysRenderGeometryFormat m_consoleVertexFormat;
         ysInputLayout *m_skinnedInputLayout;
         ysInputLayout *m_inputLayout;
+        ysInputLayout *m_consoleInputLayout;
 
         // Text Support
         Console m_console;
 
         bool m_initialized;
 
-        DRAW_TARGET m_currentTarget;
+        DrawTarget m_currentTarget;
+        CameraMode m_cameraMode;
 
         // Timing
         ysTimingSystem *m_timingSystem;
@@ -159,13 +220,12 @@ namespace dbasic {
         // Initialization Routines
         ysError InitializeGeometry();
         ysError InitializeShaders(const char *shaderDirectory);
-        ysError InitializeRendering();
 
     protected:
         // Drawing queues
         ysExpandingArray<DrawCall, 256> m_drawQueue[MAX_LAYERS];
         ysExpandingArray<DrawCall, 256> m_drawQueueGui[MAX_LAYERS];
-        ysError ExecuteDrawQueue(DRAW_TARGET target);
+        ysError ExecuteDrawQueue(DrawTarget target);
     };
 
 } /* namesapce dbasic */

@@ -71,7 +71,7 @@ public:
     unsigned int GetObjectCount() const { return m_objectCount; }
 
     unsigned int GetToolId() const { return m_toolId; }
-    bool GetCompilationStatus() const { return m_objectCount; }
+    bool GetCompilationStatus() const { return m_compilationStatus; }
 
     ysError ReadObject(ysInterchangeObject *object);
 
@@ -88,4 +88,4 @@ protected:
     bool m_compilationStatus;
 };
 
-#endif /* YDS_INTERCHANGE_FILE_H */
+#endif /* YDS_INTERCHANGE_FILE_0_0_H */
