@@ -44,6 +44,8 @@ void TemplateApplication::Initialize(void *instance, ysContextObject::DEVICE_API
 
     m_assetManager.CompileInterchangeFile((assetPath + "/icosphere").c_str(), 1.0f, true);
     m_assetManager.LoadSceneFile((assetPath + "/icosphere").c_str(), true);
+
+    m_engine.SetCameraMode(dbasic::DeltaEngine::CameraMode::Target);
 }
 
 void TemplateApplication::Process() {
@@ -63,8 +65,8 @@ void TemplateApplication::Process() {
 }
 
 void TemplateApplication::Render() {
-    m_engine.SetCameraPosition(0.0f, 0.0f);
-    m_engine.SetCameraAltitude(5.0f);
+    m_engine.SetCameraPosition(ysMath::LoadVector(4.0f, 4.0f, 2.0f));
+    m_engine.SetCameraUp(ysMath::Constants::ZAxis);
 
     m_engine.ResetLights();
     m_engine.SetAmbientLight(ysMath::GetVector4(ysColor::srgbiToLinear(0x34, 0x98, 0xdb)));
@@ -89,8 +91,19 @@ void TemplateApplication::Render() {
     light2.Position = ysVector4(-10.0f, 10.0f, 10.0f);
     m_engine.AddLight(light2);
 
-    ysMatrix rotationTurntable = ysMath::RotationTransform(ysMath::Constants::YAxis, m_currentRotation); 
+    dbasic::Light glow;
+    glow.Active = 1;
+    glow.Attenuation0 = 0.0f;
+    glow.Attenuation1 = 0.0f;
+    glow.Color = ysVector4(50.0f * m_temperature, 0.0f, 0.0f, 1.0f);
+    glow.Direction = ysVector4(0.0f, 0.0f, 0.0f, 0.0f);
+    glow.FalloffEnabled = 1;
+    glow.Position = ysVector4(0.0f, 0.0f, 0.0f);
+    m_engine.AddLight(glow);
 
+    ysMatrix rotationTurntable = ysMath::RotationTransform(ysMath::Constants::ZAxis, m_currentRotation); 
+
+    m_engine.ResetBrdfParameters();
     m_engine.SetMetallic(0.8f); 
     m_engine.SetIncidentSpecular(0.8f);
     m_engine.SetSpecularRoughness(0.7f);
@@ -100,6 +113,17 @@ void TemplateApplication::Render() {
     m_engine.SetBaseColor(ysColor::srgbiToLinear(0x34, 0x49, 0x5e));
     m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
     m_engine.DrawModel(m_assetManager.GetModelAsset("Icosphere"), 1.0f, nullptr);
+
+    m_engine.ResetBrdfParameters();
+    m_engine.SetMetallic(0.0f);
+    m_engine.SetIncidentSpecular(0.0f);
+    m_engine.SetSpecularRoughness(0.8f);
+    m_engine.SetSpecularMix(0.1f);
+    m_engine.SetDiffuseMix(1.0f);
+    m_engine.SetBaseColor(ysColor::srgbiToLinear(0xbd, 0xc3, 0xc7));
+    m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
+    m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, -1.0f)), rotationTurntable));
+    m_engine.DrawModel(m_assetManager.GetModelAsset("Floor"), 1.0f, nullptr);
 }
 
 void TemplateApplication::Run() {
