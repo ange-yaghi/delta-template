@@ -95,7 +95,7 @@ void TemplateApplication::Render() {
     glow.Active = 1;
     glow.Attenuation0 = 0.0f;
     glow.Attenuation1 = 0.0f;
-    glow.Color = ysVector4(50.0f * m_temperature, 0.0f, 0.0f, 1.0f);
+    glow.Color = ysVector4(5.0f * m_temperature, 0.0f, 0.0f, 1.0f);
     glow.Direction = ysVector4(0.0f, 0.0f, 0.0f, 0.0f);
     glow.FalloffEnabled = 1;
     glow.Position = ysVector4(0.0f, 0.0f, 0.0f);
