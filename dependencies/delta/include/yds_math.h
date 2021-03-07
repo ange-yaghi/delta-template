@@ -9,19 +9,19 @@
 // Extra Definitions
 
 #define _mm_replicate_x_ps(v) \
-	_mm_shuffle_ps((v), (v), _MM_SHUFFLE(0, 0, 0, 0))
+    _mm_shuffle_ps((v), (v), _MM_SHUFFLE(0, 0, 0, 0))
 
 #define _mm_replicate_y_ps(v) \
-	_mm_shuffle_ps((v), (v), _MM_SHUFFLE(1, 1, 1, 1))
+    _mm_shuffle_ps((v), (v), _MM_SHUFFLE(1, 1, 1, 1))
 
 #define _mm_replicate_z_ps(v) \
-	_mm_shuffle_ps((v), (v), _MM_SHUFFLE(2, 2, 2, 2))
+    _mm_shuffle_ps((v), (v), _MM_SHUFFLE(2, 2, 2, 2))
 
 #define _mm_replicate_w_ps(v) \
-	_mm_shuffle_ps((v), (v), _MM_SHUFFLE(3, 3, 3, 3))
+    _mm_shuffle_ps((v), (v), _MM_SHUFFLE(3, 3, 3, 3))
 
 #define _mm_madd_ps(a, b, c) \
-	_mm_add_ps(_mm_mul_ps((a), (b)), (c));
+    _mm_add_ps(_mm_mul_ps((a), (b)), (c));
 
 // Main Arithmetic Data Types
 typedef __m128 ysVector;
@@ -48,8 +48,8 @@ struct ysMatrix {
 // Storage Data Types
 
 struct ysVector2 {
-    ysVector2() : x(0.0f), y(0.0f) {}
-    ysVector2(float x, float y) : x(x), y(y) {}
+    ysVector2() : x(0.0f), y(0.0f) { /* void */ }
+    ysVector2(float x, float y) : x(x), y(y) { /* void */ }
 
     union {
         struct {
@@ -61,9 +61,9 @@ struct ysVector2 {
 };
 
 struct ysVector3 {
-    ysVector3() : x(0), y(0), z(0) {}
-    ysVector3(float x, float y, float z) : x(x), y(y), z(z) {}
-    ysVector3(const ysVector2 &v) : x(v.x), y(v.y), z(0) {}
+    ysVector3() : x(0), y(0), z(0) { /* void */ }
+    ysVector3(float x, float y, float z) : x(x), y(y), z(z) { /* void */ }
+    ysVector3(const ysVector2 &v) : x(v.x), y(v.y), z(0) { /* void */ }
 
     union {
         struct {
@@ -75,10 +75,10 @@ struct ysVector3 {
 };
 
 struct ysVector4 {
-    ysVector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
-    ysVector4(float x, float y, float z, float w = 0.0f) : x(x), y(y), z(z), w(w) {}
-
-    ysVector4(const ysVector3 &v) : x(v.x), y(v.y), z(v.z), w(0.0f) {}
+    ysVector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { /* void */ }
+    ysVector4(float x, float y, float z, float w = 0.0f) : x(x), y(y), z(z), w(w) { /* void */ }
+    ysVector4(const ysVector3 &v) : x(v.x), y(v.y), z(v.z), w(0.0f) { /* void */ }
+    ysVector4(const ysVector &v);
 
     void Set(float x, float y, float z, float w) { this->x = x; this->y = y; this->z = z; this->w = w; }
     void Scale(float s) { this->x *= s; this->y *= s; this->z *= s; this->w *= s; }
@@ -159,6 +159,12 @@ namespace ysMath {
         YS_MATH_CONST ysVector Half = { 0.5f, 0.5f, 0.5f, 0.5f };
         YS_MATH_CONST ysVector Double = { 2.0f, 2.0f, 2.0f, 2.0f };
 
+        YS_MATH_CONST ysMatrix Identity = { 
+            IdentityRow1, 
+            IdentityRow2, 
+            IdentityRow3, 
+            IdentityRow4 };
+
         // Numeral Constants
         YS_MATH_CONST float PI = 3.141592654f;
         YS_MATH_CONST float TWO_PI = 6.2831853071795864769252866f;
@@ -185,6 +191,7 @@ namespace ysMath {
     ysGeneric LoadVector(const ysVector3 &v, float w = 0.0f);
     ysGeneric LoadVector(const ysVector2 &v1);
     ysGeneric LoadVector(const ysVector2 &v1, const ysVector2 &v2);
+    ysGeneric Lerp(const ysGeneric &a, const ysGeneric &b, float s);
     ysQuaternion LoadQuaternion(float angle, const ysVector &axis);
 
     ysVector4 GetVector4(const ysVector &v);
@@ -216,6 +223,7 @@ namespace ysMath {
     ysVector Normalize(const ysVector &v);
     ysVector Negate(const ysVector &v);
     ysVector Negate3(const ysVector &v);
+    ysVector Abs(const ysVector &a);
 
     ysVector Mask(const ysVector &v, const ysVectorMask &mask);
     ysVector Or(const ysVector &v1, const ysVector &v2);
@@ -265,6 +273,7 @@ namespace ysMath {
 
     ysVector ComponentMax(const ysVector &a, const ysVector &b);
     ysVector ComponentMin(const ysVector &a, const ysVector &b);
+    ysVector Clamp(const ysVector &a, const ysVector &r_min, const ysVector &r_max);
 
     ysVector MaxComponent(const ysVector &v);
 

@@ -8,8 +8,14 @@ namespace dphysics {
     struct BoxPrimitive {
         ysQuaternion Orientation;
         ysVector Position;
-        float HalfWidth;
-        float HalfHeight;
+
+        union {
+            struct {
+                float HalfWidth;
+                float HalfHeight;
+            };
+            float Extents[2];
+        };
 
         void GetBounds(ysVector &minPoint, ysVector &maxPoint) const;
     };
@@ -37,9 +43,21 @@ namespace dphysics {
         friend RigidBodySystem;
 
     public:
+        enum class CollisionType {
+            PointFace,
+            EdgeEdge,
+            Generic,
+            Unknown
+        };
+
+    public:
         Collision();
-        Collision(Collision &collision);
+        Collision(const Collision &collision);
         ~Collision();
+
+        CollisionType m_collisionType;
+        int m_feature1;
+        int m_feature2;
 
         float m_penetration;
         ysVector m_normal;
@@ -74,9 +92,13 @@ namespace dphysics {
         Collision &operator=(Collision &collision);
 
         bool IsGhost() const;
+        bool IsResolvable() const;
 
         // Get velocity on impact
         ysVector GetContactVelocity() const { return m_initialContactVelocity; }
+        ysVector GetContactVelocityWorld() const;
+
+        bool IsSameAs(Collision *other) const;
 
     protected:
         ysVector m_relativePosition[2];

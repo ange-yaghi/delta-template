@@ -17,7 +17,7 @@ namespace dbasic {
     };
 
     struct ShaderObjectVariables {
-        ysMatrix Transform = ysMath::LoadIdentity();
+        ysMatrix Transform = ysMath::Constants::Identity;
 
         float TexOffset[2] = { 0.0f, 0.0f };
         float TexScale[2] = { 1.0f, 1.0f };
@@ -43,10 +43,16 @@ namespace dbasic {
     };
 
     struct ShaderScreenVariables {
-        ysMatrix CameraView = ysMath::LoadIdentity();
-        ysMatrix Projection = ysMath::LoadIdentity();
+        ysMatrix CameraView = ysMath::Constants::Identity;
+        ysMatrix Projection = ysMath::Constants::Identity;
 
-        ysVector4 Eye = { 0.0f, 0.0f, 0.0f };         
+        ysVector4 Eye = { 0.0f, 0.0f, 0.0f };
+
+        ysVector4 FogColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        float FogNear = 10.0f;
+        float FogFar = 100.0f;
+
+        int Padding[2];
     };
 
     struct ShaderSkinningControls {

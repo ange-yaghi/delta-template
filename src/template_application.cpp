@@ -10,7 +10,7 @@ TemplateApplication::~TemplateApplication() {
     /* void */
 }
 
-void TemplateApplication::Initialize(void *instance, ysContextObject::DEVICE_API api) {
+void TemplateApplication::Initialize(void *instance, ysContextObject::DeviceAPI api) {
     dbasic::Path modulePath = dbasic::GetModulePath();
     dbasic::Path confPath = modulePath.Append("delta.conf");
 
@@ -29,13 +29,26 @@ void TemplateApplication::Initialize(void *instance, ysContextObject::DEVICE_API
 
     m_engine.GetConsole()->SetDefaultFontDirectory(enginePath + "/fonts/");
 
-    m_engine.CreateGameWindow(
-        "Delta Template Application",
-        instance,
-        api,
-        (enginePath + "/shaders/").c_str());
+    const std::string shaderPath = enginePath + "/shaders/";
 
-    m_engine.SetClearColor(0x34, 0x98, 0xdb);
+    dbasic::DeltaEngine::GameEngineSettings settings;
+    settings.API = api;
+    settings.DepthBuffer = true;
+    settings.Instance = instance;
+    settings.ShaderDirectory = shaderPath.c_str();
+    settings.WindowTitle = "Delta Template Application";
+    settings.WindowPositionX = 0;
+    settings.WindowPositionY = 0;
+    settings.WindowStyle = ysWindow::WindowStyle::Windowed;
+
+    m_engine.CreateGameWindow(settings);
+
+    m_engine.InitializeShaderSet(&m_shaderSet);
+    m_engine.InitializeDefaultShaders(&m_shaders, &m_shaderSet);
+    m_engine.InitializeConsoleShaders(&m_shaderSet);
+    m_engine.SetShaderSet(&m_shaderSet);
+
+    m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
 
     m_assetManager.SetEngine(&m_engine);
 
@@ -45,18 +58,18 @@ void TemplateApplication::Initialize(void *instance, ysContextObject::DEVICE_API
     m_assetManager.CompileInterchangeFile((assetPath + "/icosphere").c_str(), 1.0f, true);
     m_assetManager.LoadSceneFile((assetPath + "/icosphere").c_str(), true);
 
-    m_engine.SetCameraMode(dbasic::DeltaEngine::CameraMode::Target);
+    m_shaders.SetCameraMode(dbasic::DefaultShaders::CameraMode::Target);
 }
 
 void TemplateApplication::Process() {
-    if (m_engine.IsKeyDown(ysKeyboard::KEY_SPACE)) {
+    if (m_engine.IsKeyDown(ysKey::Code::Space)) {
         m_currentRotation += m_engine.GetFrameLength();
     }
 
-    if (m_engine.IsKeyDown(ysKeyboard::KEY_UP)) {
+    if (m_engine.IsKeyDown(ysKey::Code::Up)) {
         m_temperature += m_engine.GetFrameLength() * 0.5f;
     }
-    else if (m_engine.IsKeyDown(ysKeyboard::KEY_DOWN)) {
+    else if (m_engine.IsKeyDown(ysKey::Code::Down)) {
         m_temperature -= m_engine.GetFrameLength() * 0.5f;
     }
 
@@ -65,11 +78,17 @@ void TemplateApplication::Process() {
 }
 
 void TemplateApplication::Render() {
-    m_engine.SetCameraPosition(ysMath::LoadVector(4.0f, 4.0f, 2.0f));
-    m_engine.SetCameraUp(ysMath::Constants::ZAxis);
+    const int screenWidth = m_engine.GetGameWindow()->GetGameWidth();
+    const int screenHeight = m_engine.GetGameWindow()->GetGameHeight();
 
-    m_engine.ResetLights();
-    m_engine.SetAmbientLight(ysMath::GetVector4(ysColor::srgbiToLinear(0x34, 0x98, 0xdb)));
+    m_shaders.SetScreenDimensions((float)screenWidth, (float)screenHeight);
+    m_shaders.CalculateCamera();
+
+    m_shaders.SetCameraPosition(ysMath::LoadVector(4.0f, 4.0f, 2.0f));
+    m_shaders.SetCameraUp(ysMath::Constants::ZAxis);
+
+    m_shaders.ResetLights();
+    m_shaders.SetAmbientLight(ysMath::GetVector4(ysColor::srgbiToLinear(0x34, 0x98, 0xdb)));
 
     dbasic::Light light;
     light.Active = 1;
@@ -79,17 +98,17 @@ void TemplateApplication::Render() {
     light.Direction = ysVector4(0.0f, 0.0f, 0.0f, 0.0f);
     light.FalloffEnabled = 0;
     light.Position = ysVector4(10.0f, 10.0f, 10.0f);
-    m_engine.AddLight(light);
+    m_shaders.AddLight(light);
 
     dbasic::Light light2;
     light2.Active = 1;
-    light2.Attenuation0 = 0.0f;
-    light2.Attenuation1 = 0.0f;
+    light2.Attenuation0 = -1.0f;
+    light2.Attenuation1 = -1.0f;
     light2.Color = ysVector4(0.3f, 0.3f, 0.5f, 1.0f);
     light2.Direction = ysVector4(0.0f, 0.0f, 0.0f, 0.0f);
     light2.FalloffEnabled = 0;
     light2.Position = ysVector4(-10.0f, 10.0f, 10.0f);
-    m_engine.AddLight(light2);
+    m_shaders.AddLight(light2);
 
     dbasic::Light glow;
     glow.Active = 1;
@@ -99,31 +118,33 @@ void TemplateApplication::Render() {
     glow.Direction = ysVector4(0.0f, 0.0f, 0.0f, 0.0f);
     glow.FalloffEnabled = 1;
     glow.Position = ysVector4(0.0f, 0.0f, 0.0f);
-    m_engine.AddLight(glow);
+    m_shaders.AddLight(glow);
 
-    ysMatrix rotationTurntable = ysMath::RotationTransform(ysMath::Constants::ZAxis, m_currentRotation); 
+    const ysMatrix rotationTurntable = ysMath::RotationTransform(ysMath::Constants::ZAxis, m_currentRotation); 
 
-    m_engine.ResetBrdfParameters();
-    m_engine.SetMetallic(0.8f); 
-    m_engine.SetIncidentSpecular(0.8f);
-    m_engine.SetSpecularRoughness(0.7f);
-    m_engine.SetSpecularMix(1.0f);
-    m_engine.SetDiffuseMix(1.0f); 
-    m_engine.SetEmission(ysMath::Mul(ysColor::srgbiToLinear(0xff, 0x0, 0x0), ysMath::LoadScalar(m_temperature))); 
-    m_engine.SetBaseColor(ysColor::srgbiToLinear(0x34, 0x49, 0x5e));
-    m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
-    m_engine.DrawModel(m_assetManager.GetModelAsset("Icosphere"), 1.0f, nullptr);
+    m_shaders.ResetBrdfParameters();
+    m_shaders.SetMetallic(0.8f);
+    m_shaders.SetIncidentSpecular(0.8f);
+    m_shaders.SetSpecularRoughness(0.7f);
+    m_shaders.SetSpecularMix(1.0f);
+    m_shaders.SetDiffuseMix(1.0f);
+    m_shaders.SetEmission(ysMath::Mul(ysColor::srgbiToLinear(0xff, 0x0, 0x0), ysMath::LoadScalar(m_temperature)));
+    m_shaders.SetBaseColor(ysColor::srgbiToLinear(0x34, 0x49, 0x5e));
+    m_shaders.SetColorReplace(true);
+    m_shaders.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
+    m_engine.DrawModel(m_shaders.GetRegularFlags(), m_assetManager.GetModelAsset("Icosphere"));
 
-    m_engine.ResetBrdfParameters();
-    m_engine.SetMetallic(0.0f);
-    m_engine.SetIncidentSpecular(0.0f);
-    m_engine.SetSpecularRoughness(0.8f);
-    m_engine.SetSpecularMix(0.1f);
-    m_engine.SetDiffuseMix(1.0f);
-    m_engine.SetBaseColor(ysColor::srgbiToLinear(0xbd, 0xc3, 0xc7));
-    m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
-    m_engine.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, -1.0f)), rotationTurntable));
-    m_engine.DrawModel(m_assetManager.GetModelAsset("Floor"), 1.0f, nullptr);
+    m_shaders.ResetBrdfParameters();
+    m_shaders.SetMetallic(0.0f);
+    m_shaders.SetIncidentSpecular(0.0f);
+    m_shaders.SetSpecularRoughness(0.8f);
+    m_shaders.SetSpecularMix(0.1f);
+    m_shaders.SetDiffuseMix(1.0f);
+    m_shaders.SetColorReplace(true);
+    m_shaders.SetBaseColor(ysColor::srgbiToLinear(0xbd, 0xc3, 0xc7));
+    m_shaders.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.0f)), rotationTurntable));
+    m_shaders.SetObjectTransform(ysMath::MatMult(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, -1.0f)), rotationTurntable));
+    m_engine.DrawModel(m_shaders.GetRegularFlags(), m_assetManager.GetModelAsset("Floor"));
 }
 
 void TemplateApplication::Run() {
@@ -138,6 +159,8 @@ void TemplateApplication::Run() {
 }
 
 void TemplateApplication::Destroy() {
+    m_shaderSet.Destroy();
+
     m_assetManager.Destroy();
     m_engine.Destroy();
 }

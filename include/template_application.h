@@ -8,13 +8,16 @@ public:
     TemplateApplication();
     ~TemplateApplication();
 
-    void Initialize(void *instance, ysContextObject::DEVICE_API api);
+    void Initialize(void *instance, ysContextObject::DeviceAPI api);
     void Run();
     void Destroy();
 
 protected:
     void Process();
     void Render();
+
+    dbasic::ShaderSet m_shaderSet;
+    dbasic::DefaultShaders m_shaders;
 
     dbasic::DeltaEngine m_engine;
     dbasic::AssetManager m_assetManager;

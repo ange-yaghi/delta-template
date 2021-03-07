@@ -4,22 +4,17 @@
 #include "yds_shader_program.h"
 
 class ysOpenGLShader;
-class ysOpenGLShaderProgram : public ysShaderProgram
-{
-
-	friend class ysOpenGLDevice;
+class ysOpenGLShaderProgram : public ysShaderProgram {
+    friend class ysOpenGLDevice;
 
 public:
-
-	ysOpenGLShaderProgram();
-	~ysOpenGLShaderProgram();
+    ysOpenGLShaderProgram();
+    ~ysOpenGLShaderProgram();
 
 protected:
+    ysOpenGLShader *GetShader(ysShader::ShaderType type);
 
-	ysOpenGLShader *GetShader(ysShader::SHADER_TYPE type);
-
-	unsigned int m_handle;
-
+    unsigned int m_handle;
 };
 
-#endif
+#endif /* YDS_OPENGL_SHADER_PROGRAM_H */

@@ -26,6 +26,10 @@ public:
     virtual ysError DestroyDevice();
     virtual bool CheckSupport();
 
+    // State
+    virtual ysError SetFaceCulling(bool faceCulling);
+    virtual ysError SetFaceCullingMode(CullMode cullMode);
+
     // Rendering Contexts
     virtual ysError CreateRenderingContext(ysRenderingContext **renderingContext, ysWindow *window);
     virtual ysError UpdateRenderingContext(ysRenderingContext *context);
@@ -35,7 +39,7 @@ public:
     virtual ysError CreateOnScreenRenderTarget(ysRenderTarget **newTarget, ysRenderingContext *context, bool depthBuffer);
     virtual ysError CreateOffScreenRenderTarget(ysRenderTarget **newTarget, int width, int height, ysRenderTarget::Format format, bool colorData, bool depthBuffer);
     virtual ysError CreateSubRenderTarget(ysRenderTarget **newTarget, ysRenderTarget *parent, int x, int y, int width, int height);
-    virtual ysError ResizeRenderTarget(ysRenderTarget *target, int width, int height);
+    virtual ysError ResizeRenderTarget(ysRenderTarget *target, int width, int height, int pwidth, int pheight);
     virtual ysError DestroyRenderTarget(ysRenderTarget *&target);
     virtual ysError SetRenderTarget(ysRenderTarget *target);
     virtual ysError SetDepthTestEnabled(ysRenderTarget *target, bool enable);
@@ -67,16 +71,17 @@ public:
     virtual ysError UseShaderProgram(ysShaderProgram *);
 
     // Input Layouts 
-    virtual ysError CreateInputLayout(ysInputLayout **newLayout, ysShader *shader, ysRenderGeometryFormat *format);
+    virtual ysError CreateInputLayout(ysInputLayout **newLayout, ysShader *shader, const ysRenderGeometryFormat *format);
     virtual ysError UseInputLayout(ysInputLayout *layout);
     virtual ysError DestroyInputLayout(ysInputLayout *&layout);
 
 
     // Textures 
     virtual ysError CreateTexture(ysTexture **texture, const char *fname);
+    virtual ysError CreateAlphaTexture(ysTexture **texture, int width, int height, const unsigned char *buffer);
     virtual ysError DestroyTexture(ysTexture *&texture);
     virtual ysError UseTexture(ysTexture *texture, int slot);
-    virtual ysError UseRenderTargetAsTexture(ysRenderTarget *texture, int slot);
+    virtual ysError UseRenderTargetAsTexture(ysRenderTarget *renderTarget, int slot);
 
     virtual void Draw(int numFaces, int indexOffset, int vertexOffset);
 

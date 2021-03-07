@@ -17,7 +17,7 @@ namespace dphysics {
     class DeltaEngine;
     class RigidBodySystem : public ysObject {
     public:
-        static const int ResolutionIterationLimit = 128;
+        static const int ResolutionIterationLimit = 1024;
         static float ResolutionPenetrationEpsilon;
 
         struct CollisionGenerationCallData {
@@ -62,8 +62,12 @@ namespace dphysics {
         void CloseReplayFile();
 
     protected:
+        bool CollisionExists(Collision *collision);
+
         void GenerateCollisions();
         void InitializeCollisions();
+        void CleanCollisions();
+        void ClearCollisions();
         void GenerateCollisions(RigidBody *body1, RigidBody *body2);
 
         void ResolveCollisions(float dt);
@@ -83,6 +87,8 @@ namespace dphysics {
 
         void WriteFrameToReplayFile();
 
+        void AttachBreakdownTimer(ysBreakdownTimer *breakdownTimer) { m_breakdownTimer = breakdownTimer; }
+
     protected:
         ysRegistry<RigidBody, 512> m_rigidBodyRegistry;
 
@@ -100,6 +106,8 @@ namespace dphysics {
         int m_lastLoadMeasurement;
         int m_loadMeasurement;
         float m_currentStep;
+
+        ysBreakdownTimer *m_breakdownTimer;
 
         // TEST
         GridPartitionSystem m_gridPartitionSystem;

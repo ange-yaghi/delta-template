@@ -3,7 +3,10 @@
 
 #include "delta_core.h"
 
+#include "font.h"
 #include "shader_controls.h"
+#include "ui_renderer.h"
+#include "console_shaders.h"
 
 #include <string>
 
@@ -12,91 +15,36 @@ namespace dbasic {
     // Class name declarations
     class DeltaEngine;
 
-    struct GuiPoint {
-        GuiPoint(int x, int y) : x(x), y(y) {}
-        GuiPoint() : x(0), y(0) {}
-        ~GuiPoint() {}
-
-        GuiPoint operator+(const GuiPoint &p) {
-            return GuiPoint(x + p.x, y + p.y);
-        }
-
-        GuiPoint operator-(const GuiPoint &p) {
-            return GuiPoint(x - p.x, y - p.y);
-        }
-
-        GuiPoint operator+=(const GuiPoint &p) {
-            x += p.x;
-            y += p.y;
-
-            return *this;
-        }
-
-        GuiPoint operator-=(const GuiPoint &p) {
-            x -= p.x;
-            y -= p.y;
-
-            return *this;
-        }
-
-        void Clear() {
-            x = 0;
-            y = 0;
-        }
-
-        int x;
-        int y;
-    };
-
     class Console : public ysObject {
     public:
-        static const int BUFFER_WIDTH = 175;
-        static const int BUFFER_HEIGHT = 75;
-        static const int BUFFER_SIZE = BUFFER_WIDTH * BUFFER_HEIGHT; // Maximum of 4096 characters displayed at once
+        static const int BufferWidth = 175;
+        static const int BufferHeight = 75;
+        static const int BufferSize = BufferWidth * BufferHeight; // Maximum of 4096 characters displayed at once
 
     public:
         Console();
         ~Console();
 
+        ysError Initialize();
+        ysError ResetScreenPosition();
         ysError Destroy();
 
-        ysError UpdateDisplay();
-
-        void SetEngine(DeltaEngine *engine) { m_engine = engine; }
-        DeltaEngine *GetEngine() { return m_engine; }
-
-        ysError Initialize();
+        ysError UpdateGeometry();
 
         void SetDefaultFontDirectory(const std::string &s) { m_defaultFontDirectory = s; }
         std::string GetDefaultFontDirectory() const { return m_defaultFontDirectory; }
 
-    protected:
-        DeltaEngine *m_engine;
+        void SetEngine(DeltaEngine *engine) { m_engine = engine; }
+        DeltaEngine *GetEngine() const { return m_engine; }
 
-        ysGPUBuffer *m_mainVertexBuffer;
-        ysGPUBuffer *m_mainIndexBuffer;
+        void SetRenderer(UiRenderer *renderer) { m_renderer = renderer; }
+        UiRenderer *GetRenderer() const { return m_renderer; }
 
-        // Textures
-        ysTexture *m_font;
-
-        ysShader *m_vertexShader;
-        ysShader *m_pixelShader;
-        ysShaderProgram *m_shaderProgram;
-
-        ysRenderGeometryFormat m_standardFormat;
-        ysInputLayout *m_standardInputLayout;
-
-        // Vertex buffer
-        ConsoleVertex *m_vertexData;
+        Font *GetFont() const { return m_font; }
 
     protected:
         // Settings
-        float m_clearColor[4];
-
         std::string m_defaultFontDirectory;
-
-    protected:
-        ysError InitializeGeometry();
 
     protected:
         // Window metrics
@@ -116,10 +64,12 @@ namespace dbasic {
         GuiPoint m_nominalLocation;
         GuiPoint m_actualLocation;
 
-        ysVector4 m_fontForeColor;
-        ysVector4 m_fontBackColor;
+        DeltaEngine *m_engine;
+        UiRenderer *m_renderer;
 
-        bool m_fontBold;
+        Font *m_font;
+
+        char *m_buffer;
 
     public:
         // ----------------------------------------------------
@@ -132,20 +82,14 @@ namespace dbasic {
         // Drawing Text
         ysError SetCharacter(char character);
 
-        void SetFontForeColor(float r, float g, float b, float a) { m_fontForeColor = ysVector4(r, g, b, a); }
-        void SetFontForeColor(ysVector4 &color) { m_fontForeColor = color; }
-
-        void SetFontBackColor(float r, float g, float b, float a) { m_fontBackColor = ysVector4(r, g, b, a); }
-        void SetFontBackColor(ysVector4 &color) { m_fontBackColor = color; }
-
-        void SetFontBold(bool fontBold) { m_fontBold = fontBold; }
-
         void Clear();
 
         void OutputChar(unsigned char c, int n = 1);
         void DrawGeneralText(const char *text, int maxLength = -1);
         void DrawBoundText(const char *text, int width, int height, int xOffset, int yOffset);
         void DrawWrappedText(const char *text, int width);
+
+        int GetTotalNotWhitespace() const;
 
         // Drawing Shapes
         void DrawLineRectangle(int width, int height);
@@ -159,6 +103,7 @@ namespace dbasic {
         // Navigation
         void MoveDownLine(int n = 1);
         void MoveToLocation(const GuiPoint &location);
+        void MoveToOrigin();
     };
 
 } /* namespace dbasic */

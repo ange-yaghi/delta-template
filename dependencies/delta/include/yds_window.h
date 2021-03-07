@@ -12,18 +12,18 @@ public:
     static const int MAX_NAME_LENGTH = 256;
 
     enum class WindowState {
-        VISIBLE,
-        HIDDEN,
-        MAXIMIZED,
-        MINIMIZED,
-        CLOSED,
+        Visible,
+        Hidden,
+        Maximized,
+        Minimized,
+        Closed,
         Unknown
     };
 
     enum class WindowStyle {
-        WINDOWED,
-        FULLSCREEN,
-        POPUP,
+        Windowed,
+        Fullscreen,
+        Popup,
         Unknown
     };
 
@@ -36,29 +36,50 @@ public:
     virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, int x, int y, int width, int height, ysMonitor *monitor);
     virtual ysError InitializeWindow(ysWindow *parent, const char *title, WindowStyle style, ysMonitor *monitor);
 
-    virtual void Close() { SetState(WindowState::CLOSED); }
-    virtual void SetState(WindowState state = WindowState::VISIBLE) { m_windowState = state; }
+    virtual void Close() { SetState(WindowState::Closed); }
+    virtual void SetState(WindowState state = WindowState::Visible) { m_windowState = state; }
 
     void RestoreWindow();
 
-    int GetWidth()			const { return m_width; }
-    int GetHeight()			const { return m_height; }
-    int GetScreenWidth()	const { return m_width - m_frameWidthOffset; }
-    int GetScreenHeight()	const { return m_height - m_frameHeightOffset; }
-    WindowStyle GetStyle() const { return m_windowStyle; }
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
+    virtual int GetScreenWidth() const { return m_width; }
+    virtual int GetScreenHeight() const { return m_height; }
+    WindowStyle GetWindowStyle() const { return m_windowStyle; }
     ysMonitor *GetMonitor() const { return m_monitor; }
 
-    bool IsOpen();
+    const int GetGameWidth() const;
+    const int GetGameHeight() const;
+
+    int GetPositionX() const { return m_locationx; }
+    int GetPositionY() const { return m_locationy; }
+
+    virtual void ScreenToLocal(int &x, int &y) { /* void */ }
+
+    bool IsOpen() const;
     virtual bool IsActive();
     virtual bool IsVisible();
 
-    virtual void SetSize(int width, int height);
+    virtual void SetScreenSize(int width, int height);
+    virtual void SetWindowSize(int width, int height);
     virtual void SetLocation(int x, int y);
     virtual void SetTitle(const char *title);
+
+    virtual void StartResizing() { m_resizing = true; }
+    virtual void EndResizing() { m_resizing = false; }
+    bool IsResizing() const { return m_resizing; }
 
     virtual bool SetWindowStyle(WindowStyle style);
 
     void AttachEventHandler(ysWindowEventHandler *handler);
+
+    void SetGameResolutionScale(float scale);
+
+    void SetGameResolutionScaleHorizontal(float scale);
+    float GetGameResolutionScaleHorizontal() const { return m_gameResolutionScaleHorizontal; }
+
+    void SetGameResolutionScaleVertical(float scale);
+    float GetGameResolutionScaleVertical() const { return m_gameResolutionScaleVertical; }
 
 public:
     // Handlers
@@ -89,18 +110,6 @@ protected:
     // Location y
     int m_locationy;
 
-    // Frame Origin Offset
-    int m_frameOriginXOffset;
-
-    // Frame Origin Offset
-    int m_frameOriginYOffset;
-
-    // Frame Width Offset
-    int m_frameWidthOffset;
-
-    // Frame Height Offset
-    int m_frameHeightOffset;
-
     // Title
     char m_title[MAX_NAME_LENGTH];
 
@@ -118,6 +127,12 @@ protected:
 
     // Window Active
     bool m_active;
+
+    // Status flag indicating whether the window is resizing
+    bool m_resizing;
+
+    float m_gameResolutionScaleHorizontal;
+    float m_gameResolutionScaleVertical;
 
 protected:
     // Event handler

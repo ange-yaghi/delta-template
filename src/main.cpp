@@ -8,7 +8,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     (void)hPrevInstance;
 
     TemplateApplication app; 
-    app.Initialize((void *)&hInstance, ysContextObject::DIRECTX11); 
+    app.Initialize((void *)&hInstance, ysContextObject::DeviceAPI::DirectX11); 
     app.Run();
     app.Destroy();
 

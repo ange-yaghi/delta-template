@@ -3,35 +3,32 @@
 
 #include "yds_base.h"
 
-class ysContextObject : public ysObject
-{
+#include <string>
+
+class ysContextObject : public ysObject {
+public:
+    enum class DeviceAPI {
+        Unknown,
+        DirectX10,
+        DirectX11,
+        OpenGL4_0
+    };
 
 public:
+    ysContextObject();
+    ysContextObject(const char *typeID, DeviceAPI API);
+    virtual ~ysContextObject();
 
-	enum DEVICE_API
-	{
+    DeviceAPI GetAPI() const { return m_api; }
 
-		API_UNKNOWN,
-		DIRECTX10,
-		DIRECTX11,
-		OPENGL4_0
+    bool CheckCompatibility(const ysContextObject *object) const;
 
-	};
-
-public:
-
-	ysContextObject();
-	ysContextObject(const char *typeID, DEVICE_API API);
-	virtual ~ysContextObject();
-
-	DEVICE_API GetAPI() const { return m_api; }
-
-	bool CheckCompatibility(ysContextObject *object) const { return (object) ? object->m_api == m_api : true; }
+    virtual void SetDebugName(const std::string &debugName) { m_debugName = debugName; }
+    std::string GetDebugName() const { return m_debugName; }
 
 private:
-
-	DEVICE_API m_api;
-
+    DeviceAPI m_api;
+    std::string m_debugName;
 };
 
-#endif
+#endif /* YDS_CONTEXT_OBJECT_H */
