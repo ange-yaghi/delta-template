@@ -14,6 +14,7 @@
 *.userprefs
 
 # Build results
+build/
 [Dd]ebug/
 !dependencies/**/[Dd]ebug/
 [Dd]ebugPublic/
@@ -348,5 +349,6 @@ ASALocalRun/
 # Ignore user's workspace
 workspace/
 
-# Submodules
-dependencies/submodules/
+# clangd cache and code completion files
+.cache
+compile_commands.json

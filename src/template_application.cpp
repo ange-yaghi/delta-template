@@ -14,8 +14,8 @@ void TemplateApplication::Initialize(void *instance, ysContextObject::DeviceAPI 
     dbasic::Path modulePath = dbasic::GetModulePath();
     dbasic::Path confPath = modulePath.Append("delta.conf");
 
-    std::string enginePath = "../../dependencies/delta/engines/basic";
-    std::string assetPath = "../../assets";
+    std::string enginePath = "../dependencies/submodules/delta-studio/engines/basic";
+    std::string assetPath = "../assets";
     if (confPath.Exists()) {
         std::fstream confFile(confPath.ToString(), std::ios::in);
         
