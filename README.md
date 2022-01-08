@@ -1,4 +1,4 @@
-### Delta Template Project
+# Delta Template Project
 
 This is a basic template project used to create an application that uses the [Delta Studio](https://github.com/ange-yaghi/delta-studio) game engine.
 
